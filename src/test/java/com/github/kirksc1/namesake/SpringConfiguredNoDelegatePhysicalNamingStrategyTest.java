@@ -2,6 +2,7 @@ package com.github.kirksc1.namesake;
 
 import com.github.kirksc1.namesake.entity.Foo;
 import com.github.kirksc1.namesake.entity.FooRepository;
+import org.hibernate.boot.model.naming.PhysicalNamingStrategy;
 import org.hibernate.internal.SessionImpl;
 import org.hibernate.persister.entity.AbstractEntityPersister;
 import org.hibernate.persister.entity.EntityPersister;
@@ -9,6 +10,9 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.context.TestConfiguration;
+import org.springframework.context.annotation.Bean;
+import org.springframework.core.env.Environment;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -19,13 +23,21 @@ import static org.junit.Assert.assertTrue;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest(properties = {"foo.name=CustomTable","foo.field.name=CustomField", "foo.field.id=CustomId", "spring.jpa.show-sql=true"})
-public class SpringConfiguredPhysicalNamingStrategyTest {
+public class SpringConfiguredNoDelegatePhysicalNamingStrategyTest {
 
     @Autowired
     EntityManager entityManager;
 
     @Autowired
     FooRepository fooRepository;
+
+    @TestConfiguration
+    static class TestConfig {
+        @Bean
+        public PhysicalNamingStrategy namesakePhysicalNamingStrategy(Environment environment) {
+            return new SpringConfiguredPhysicalNamingStrategy(environment);
+        }
+    }
 
     @Test
     public void testFooCanBeSavedAndRetrieved() {
@@ -43,8 +55,8 @@ public class SpringConfiguredPhysicalNamingStrategyTest {
         String[] tableNames = getTableNames(entityManager, Foo.class);
 
         assertEquals(2, tableNames.length);
-        assertEquals("custom_table", tableNames[0]); //Table name
-        assertEquals("custom_table", tableNames[1]); //Root table name
+        assertEquals("CustomTable", tableNames[0]); //Table name
+        assertEquals("CustomTable", tableNames[1]); //Root table name
     }
 
     @Test
@@ -53,7 +65,7 @@ public class SpringConfiguredPhysicalNamingStrategyTest {
         String[] fieldNames = getFieldNames(entityManager, Foo.class, "name");
 
         assertEquals(1, fieldNames.length);
-        assertEquals("custom_field", fieldNames[0]);
+        assertEquals("CustomField", fieldNames[0]);
     }
 
     public String[] getTableNames(EntityManager em, Class entityClass) {

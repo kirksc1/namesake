@@ -1,15 +1,16 @@
 package com.github.kirksc1.namesake.entity;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.Id;
-import javax.persistence.Table;
+import javax.persistence.*;
 
 @Entity
 @Table(name="${foo.name:TableFoo}")
 public class Foo {
 
     @Id
+    @GeneratedValue(strategy= GenerationType.AUTO)
+    @Column(name = "${foo.field.id}")
+    private Long id;
+
     @Column(name = "${foo.field.name:ColumnName}")
     private String name;
 
