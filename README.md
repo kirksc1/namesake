@@ -1,4 +1,4 @@
-# Sagacious
+# Namesake
 [![Build Status](https://travis-ci.org/kirksc1/namesake.svg?branch=master)](https://travis-ci.org/kirksc1/namesake)
 [![codecov](https://codecov.io/gh/kirksc1/namesake/branch/master/graph/badge.svg)](https://codecov.io/gh/kirksc1/namesake)
 ## Purpose
