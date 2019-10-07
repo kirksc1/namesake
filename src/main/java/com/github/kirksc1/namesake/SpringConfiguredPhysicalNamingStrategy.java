@@ -15,17 +15,10 @@ import java.util.stream.StreamSupport;
 
 public class SpringConfiguredPhysicalNamingStrategy implements PhysicalNamingStrategy {
 
-    private static final PhysicalNamingStrategy NO_OP_STRATEGY = new NoOpPhyscialNamingStrategy();
-
     private final Properties properties;
     private final PropertyPlaceholderHelper helper = new PropertyPlaceholderHelper("${", "}", ":", true);
-    private final PhysicalNamingStrategy delegate;
 
     public SpringConfiguredPhysicalNamingStrategy(Environment environment) {
-        this(environment, NO_OP_STRATEGY);
-    }
-
-    public SpringConfiguredPhysicalNamingStrategy(Environment environment, PhysicalNamingStrategy delegate) {
         Properties tempProperties = new Properties();
         MutablePropertySources propertySources = ((AbstractEnvironment) environment).getPropertySources();
         StreamSupport.stream(propertySources.spliterator(), false)
@@ -34,32 +27,31 @@ public class SpringConfiguredPhysicalNamingStrategy implements PhysicalNamingStr
                 .flatMap(Arrays::<String>stream)
                 .forEach(propName -> tempProperties.setProperty(propName, environment.getProperty(propName)));
         this.properties = tempProperties;
-        this.delegate = delegate;
     }
 
     @Override
     public Identifier toPhysicalCatalogName(final Identifier identifier, final JdbcEnvironment jdbcEnv) {
-        return delegate.toPhysicalCatalogName(convertExpression(identifier), jdbcEnv);
+        return convertExpression(identifier);
     }
 
     @Override
     public Identifier toPhysicalColumnName(final Identifier identifier, final JdbcEnvironment jdbcEnv) {
-        return delegate.toPhysicalColumnName(convertExpression(identifier), jdbcEnv);
+        return convertExpression(identifier);
     }
 
     @Override
     public Identifier toPhysicalSchemaName(final Identifier identifier, final JdbcEnvironment jdbcEnv) {
-        return delegate.toPhysicalSchemaName(convertExpression(identifier), jdbcEnv);
+        return convertExpression(identifier);
     }
 
     @Override
     public Identifier toPhysicalSequenceName(final Identifier identifier, final JdbcEnvironment jdbcEnv) {
-        return delegate.toPhysicalSequenceName(convertExpression(identifier), jdbcEnv);
+        return convertExpression(identifier);
     }
 
     @Override
     public Identifier toPhysicalTableName(final Identifier identifier, final JdbcEnvironment jdbcEnv) {
-        return delegate.toPhysicalTableName(convertExpression(identifier), jdbcEnv);
+        return convertExpression(identifier);
     }
 
     private Identifier convertExpression(final Identifier identifier) {

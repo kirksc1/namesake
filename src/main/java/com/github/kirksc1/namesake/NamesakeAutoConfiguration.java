@@ -15,7 +15,7 @@ public class NamesakeAutoConfiguration {
     @Bean
     @ConditionalOnMissingBean(name="namesakePhysicalNamingStrategy")
     public PhysicalNamingStrategy namesakePhysicalNamingStrategy(Environment environment) {
-        return new SpringConfiguredPhysicalNamingStrategy(environment, new SpringPhysicalNamingStrategy());
+        return new ChainedPhyscialNamingStrategy(new SpringConfiguredPhysicalNamingStrategy(environment), new SpringPhysicalNamingStrategy());
     }
 
 }
