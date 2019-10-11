@@ -1,7 +1,7 @@
 package com.github.kirksc1.namesake;
 
-import com.github.kirksc1.namesake.entity.Foo;
-import com.github.kirksc1.namesake.entity.FooRepository;
+import com.github.kirksc1.namesake.entity.Goo;
+import com.github.kirksc1.namesake.entity.GooRepository;
 import org.hibernate.boot.model.naming.PhysicalNamingStrategy;
 import org.hibernate.internal.SessionImpl;
 import org.hibernate.persister.entity.AbstractEntityPersister;
@@ -12,7 +12,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.context.annotation.Bean;
-import org.springframework.core.env.Environment;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -22,50 +21,50 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
 @RunWith(SpringRunner.class)
-@SpringBootTest(properties = {"foo.name=CustomTable","foo.field.name=CustomField", "foo.field.id=CustomId", "spring.jpa.show-sql=true"})
-public class SpringConfiguredNoDelegatePhysicalNamingStrategyTest {
+@SpringBootTest()
+public class EmptyChainedPhysicalNamingStrategyTest {
 
     @Autowired
     EntityManager entityManager;
 
     @Autowired
-    FooRepository fooRepository;
+    GooRepository gooRepository;
 
     @TestConfiguration
     static class TestConfig {
         @Bean
-        public PhysicalNamingStrategy namesakePhysicalNamingStrategy(Environment environment) {
-            return new SpringConfiguredPhysicalNamingStrategy(environment);
+        public PhysicalNamingStrategy namesakePhysicalNamingStrategy() {
+            return new ChainedPhyscialNamingStrategy();
         }
     }
 
     @Test
-    public void testFooCanBeSavedAndRetrieved() {
-        Foo foo = new Foo();
-        foo.setName("test");
+    public void testGooCanBeSavedAndRetrieved() {
+        Goo goo = new Goo();
+        goo.setName("test");
 
-        fooRepository.save(foo);
+        gooRepository.save(goo);
 
-        assertTrue(fooRepository.findByName("test").isPresent());
+        assertTrue(gooRepository.findByName("test").isPresent());
     }
 
     @Test
     @Transactional
     public void testTableNameIsCorrect() {
-        String[] tableNames = getTableNames(entityManager, Foo.class);
+        String[] tableNames = getTableNames(entityManager, Goo.class);
 
         assertEquals(2, tableNames.length);
-        assertEquals("CustomTable", tableNames[0]); //Table name
-        assertEquals("CustomTable", tableNames[1]); //Root table name
+        assertEquals("standard_table", tableNames[0]); //Table name
+        assertEquals("standard_table", tableNames[1]); //Root table name
     }
 
     @Test
     @Transactional
     public void testFieldNameIsCorrect() {
-        String[] fieldNames = getFieldNames(entityManager, Foo.class, "name");
+        String[] fieldNames = getFieldNames(entityManager, Goo.class, "name");
 
         assertEquals(1, fieldNames.length);
-        assertEquals("CustomField", fieldNames[0]);
+        assertEquals("standard_field", fieldNames[0]);
     }
 
     public String[] getTableNames(EntityManager em, Class entityClass) {
